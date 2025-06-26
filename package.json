@@ -1,0 +1,38 @@
+{
+  "name": "sui-tg-whale-bot",
+  "version": "1.0.0",
+  "description": "Sui Telegram Whale Bot",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "db:migrate": "prisma migrate dev --name",
+    "db:generate": "prisma generate",
+    "db:pull": "prisma db pull",
+    "postinstall": "prisma generate"
+  },
+  "keywords": [
+    "nodejs",
+    "typescript",
+    "prisma",
+    "starter",
+    "template"
+  ],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.11.0",
+  "dependencies": {
+    "@prisma/client": "6.10.1",
+    "dotenv": "^16.5.0",
+    "https-proxy-agent": "^7.0.6",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.10.1",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

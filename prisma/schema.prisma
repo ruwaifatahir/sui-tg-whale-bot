@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  EXPIRED
+  PROCESSING
+}
+
+model BoostOrder {
+  id                     String        @id
+  telegramChatId         BigInt
+  tokenAddress           String
+  tgUrl                  String
+  boostPackage           String
+  boostDurationHours     Int
+  priceSui               Float
+  paymentAddress         String        @unique
+  paymentPrivateKey      String
+  paymentStatus          PaymentStatus @default(PENDING)
+  boostStartedAt         DateTime?
+  boostEndsAt            DateTime?
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime
+  paymentTransactionHash String?
+  refundAddress          String?
+  refundTransactionHash  String?
+  emoji                  String?
+  telegramHandle         String?
+  userId                 String
+  website                String?
+  xHandle                String?
+}
+
+enum MediaType {
+  PHOTO
+  VIDEO
+  ANIMATION
+}
+
+model BotGroup {
+  id         String   @id @default(cuid())
+  groupId    String   @unique
+  groupTitle String?
+  addedBy    String
+  addedAt    DateTime @default(now())
+
+  // Configuration
+  isActive Boolean @default(true)
+  token    String?
+  minBuy   Float   @default(1000)
+  emoji    String  @default("🐳")
+
+  // Media handling (stored as URLs)
+  mediaType MediaType?
+  mediaUrl  String?
+
+  referral String?
+  website  String?
+  telegram String?
+  x        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
