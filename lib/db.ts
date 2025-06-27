@@ -33,3 +33,11 @@ export const updateBotGroup = async (
     data,
   });
 };
+
+export const deleteBotGroup = async (groupId: string) => {
+  return await prisma.botGroup.delete({
+    where: {
+      groupId,
+    },
+  });
+};

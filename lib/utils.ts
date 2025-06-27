@@ -90,7 +90,7 @@ export const listGroupsMessage = async (ctx: BotContext) => {
   } else {
     await ctx.replyWithHTML(
       `<b>👋 Welcome to Sui Telegram Whale Bot!</b>\n\n` +
-        `<i>This bot tracks whale transactions on the Sui blockchain and sends alerts to your group.</i>\n\n` +
+        `<i>This bot tracks whale transactions on the Sui blockchain for your coin and sends alerts to your group.</i>\n\n` +
         `<b>To get started:</b>\n` +
         `1️⃣ Add this bot to your group\n` +
         `2️⃣ Configure your alert settings\n` +

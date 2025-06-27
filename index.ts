@@ -6,7 +6,12 @@ import { message } from "telegraf/filters";
 import { store } from "./lib/redis";
 import { BotContext } from "./lib/types";
 
-import { createBotGroup, getBotGroup, updateBotGroup } from "./lib/db";
+import {
+  createBotGroup,
+  deleteBotGroup,
+  getBotGroup,
+  updateBotGroup,
+} from "./lib/db";
 import {
   createWaitingAction,
   isValidSuiAddress,
@@ -53,6 +58,15 @@ bot.start(async (ctx) => {
   } else if (ctx.chat.type === "private") {
     await listGroupsMessage(ctx);
   }
+});
+
+bot.command("help", async (ctx) => {
+  await ctx.replyWithHTML(
+    `<b>📚 Available Commands</b>\n\n` +
+      `<b>/start</b> - Start the bot\n` +
+      `<b>/groups</b> - List your groups\n` +
+      `<b>/help</b> - Show this help message`
+  );
 });
 
 bot.command("groups", async (ctx) => {
@@ -267,6 +281,15 @@ bot.on("my_chat_member", async (ctx) => {
         ],
       ])
     );
+  } else if (
+    old_chat_member.status === "member" &&
+    (new_chat_member.status === "left" || new_chat_member.status === "kicked")
+  ) {
+    const group = await deleteBotGroup(ctx.chat.id.toString());
+
+    console.log(
+      `Bot was removed from group ${group.groupTitle} - ${group.groupId}`
+    );
   }
 });
 
@@ -304,16 +327,6 @@ bot.action("toggle_bot", async (ctx) => {
   await editGroupMessage(
     ctx,
     group.isActive ? "Bot deactivated" : "Bot activated"
-  );
-});
-
-// Add a help command
-bot.command("help", async (ctx) => {
-  await ctx.replyWithHTML(
-    `<b>📚 Available Commands</b>\n\n` +
-      `<b>/start</b> - Start the bot\n` +
-      `<b>/groups</b> - List your groups\n` +
-      `<b>/help</b> - Show this help message`
   );
 });
 
