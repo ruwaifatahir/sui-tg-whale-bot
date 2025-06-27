@@ -55,7 +55,7 @@ model BotGroup {
 
   // Configuration
   isActive Boolean @default(true)
-  token    String?
+  tokenAddress    String?
   minBuy   Float   @default(1000)
   emoji    String  @default("🐳")
 

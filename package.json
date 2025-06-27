@@ -10,6 +10,7 @@
     "db:migrate": "prisma migrate dev --name",
     "db:generate": "prisma generate",
     "db:pull": "prisma db pull",
+    "db:push": "prisma db push",
     "postinstall": "prisma generate"
   },
   "keywords": [

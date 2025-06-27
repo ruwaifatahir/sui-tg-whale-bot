@@ -31,9 +31,12 @@ export const editGroupMessage = async (ctx: BotContext, message?: string) => {
         `<b>• Group:</b> ${group.groupTitle || "Unknown"}\n` +
         `<b>• Status:</b> ${statusEmoji} ${statusText}\n` +
         `<b>• Token:</b> ${
-          group.token
-            ? `<code>${group.token.substring(0, 10)}...${group.token.substring(
-                group.token.length - 6
+          group.tokenAddress
+            ? `<code>${group.tokenAddress.substring(
+                0,
+                10
+              )}...${group.tokenAddress.substring(
+                group.tokenAddress.length - 6
               )}</code>`
             : "Not set"
         }\n` +

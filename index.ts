@@ -91,7 +91,7 @@ bot.command("test", async (ctx) => {
   // Prepare caption
   const caption =
     `🔍 Test Message\n\n` +
-    `Token: ${group.token || "Not set"}\n` +
+    `Token: ${group.tokenAddress || "Not set"}\n` +
     `Min Buy: ${group.minBuy} SUI\n` +
     `${group.emoji || "🐳"} Website: ${group.website || "Not set"}`;
 
@@ -137,7 +137,7 @@ bot.on(message("text"), async (ctx) => {
     }
 
     await updateBotGroup(groupId, {
-      token: messageText,
+      tokenAddress: messageText,
     });
 
     return await ctx.replyWithHTML(
