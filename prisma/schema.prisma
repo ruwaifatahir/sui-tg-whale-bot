@@ -8,13 +8,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-enum PaymentStatus {
-  PENDING
-  CONFIRMED
-  EXPIRED
-  PROCESSING
-}
-
 model BoostOrder {
   id                     String        @id
   telegramChatId         BigInt
@@ -33,40 +26,41 @@ model BoostOrder {
   paymentTransactionHash String?
   refundAddress          String?
   refundTransactionHash  String?
-  emoji                  String?
-  telegramHandle         String?
+  emoji                  String?       @default("🐳")
   userId                 String
   website                String?
-  xHandle                String?
+  telegram               String?
+  x                      String?
+}
+
+model BotGroup {
+  id           String     @id @default(cuid())
+  groupId      String     @unique
+  groupTitle   String?
+  addedBy      String
+  addedAt      DateTime   @default(now())
+  isActive     Boolean    @default(true)
+  minBuy       Float      @default(1000)
+  emoji        String     @default("🐳")
+  mediaType    MediaType?
+  mediaUrl     String?
+  website      String?
+  telegram     String?
+  x            String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  tokenAddress String?
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  EXPIRED
+  PROCESSING
 }
 
 enum MediaType {
   PHOTO
   VIDEO
   ANIMATION
-}
-
-model BotGroup {
-  id         String   @id @default(cuid())
-  groupId    String   @unique
-  groupTitle String?
-  addedBy    String
-  addedAt    DateTime @default(now())
-
-  // Configuration
-  isActive Boolean @default(true)
-  tokenAddress    String?
-  minBuy   Float   @default(1000)
-  emoji    String  @default("🐳")
-
-  // Media handling (stored as URLs)
-  mediaType MediaType?
-  mediaUrl  String?
-
-  website  String?
-  telegram String?
-  x        String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
