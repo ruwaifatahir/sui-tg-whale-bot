@@ -66,12 +66,12 @@ bot.command("test", async (ctx) => {
   const group = await getBotGroup(groupId);
 
   if (!group) {
-    return await ctx.reply("No group selected");
+    return await ctx.replyWithHTML("<b>❌ No group selected</b>");
   }
 
   // If no media set
   if (!group.mediaUrl) {
-    return await ctx.reply("No media set for this group");
+    return await ctx.replyWithHTML("<b>❌ No media set for this group</b>");
   }
 
   // Prepare caption
@@ -85,17 +85,28 @@ bot.command("test", async (ctx) => {
   try {
     switch (group.mediaType) {
       case "PHOTO":
-        await ctx.replyWithPhoto(group.mediaUrl, { caption });
+        await ctx.replyWithPhoto(group.mediaUrl, {
+          caption: caption,
+          parse_mode: "HTML",
+        });
         break;
       case "VIDEO":
-        await ctx.replyWithVideo(group.mediaUrl, { caption });
+        await ctx.replyWithVideo(group.mediaUrl, {
+          caption: caption,
+          parse_mode: "HTML",
+        });
         break;
       case "ANIMATION":
-        await ctx.replyWithAnimation(group.mediaUrl, { caption });
+        await ctx.replyWithAnimation(group.mediaUrl, {
+          caption: caption,
+          parse_mode: "HTML",
+        });
         break;
     }
   } catch (error) {
-    await ctx.reply("Error sending media. Please try setting media again.");
+    await ctx.replyWithHTML(
+      "<b>❌ Error sending media. Please try setting media again.</b>"
+    );
   }
 });
 
@@ -106,63 +117,89 @@ bot.on(message("text"), async (ctx) => {
 
   if (pendingEdits.waitingForToken) {
     if (!isValidSuiAddress(messageText)) {
-      return await ctx.reply("Invalid SUI address");
+      return await ctx.replyWithHTML(
+        "<b>❌ Invalid SUI address</b>\n\nPlease send a valid SUI address."
+      );
     }
 
     await updateBotGroup(groupId, {
       token: messageText,
     });
 
-    return await ctx.reply(`✅ Token address saved: ${messageText}`);
+    return await ctx.replyWithHTML(
+      `<b>✅ Token address saved!</b>\n\n<code>${messageText}</code>`
+    );
   } else if (pendingEdits.waitingForEmoji) {
     if (messageText.length > MAX_EMOJI_LENGTH) {
-      return await ctx.reply("Emoji must be a single character");
+      return await ctx.replyWithHTML(
+        "<b>❌ Emoji must be a single character</b>"
+      );
     }
 
     await updateBotGroup(groupId, {
       emoji: messageText,
     });
 
-    return await ctx.reply(`✅ Emoji saved: ${messageText}`);
+    return await ctx.replyWithHTML(`<b>✅ Emoji saved!</b>\n\n${messageText}`);
   } else if (pendingEdits.waitingForMinBuy) {
     if (parseFloat(messageText) < MIN_WHALE_BUY) {
-      return await ctx.reply("Min buy must be greater than 1000");
+      return await ctx.replyWithHTML(
+        `<b>❌ Min buy must be greater than ${MIN_WHALE_BUY}</b>`
+      );
     }
     await updateBotGroup(groupId, {
       minBuy: parseFloat(messageText),
     });
 
-    return await ctx.reply(`✅ Min buy saved: ${messageText}`);
+    return await ctx.replyWithHTML(
+      `<b>✅ Min buy saved!</b>\n\n<code>${messageText}</code> SUI`
+    );
   } else if (pendingEdits.waitingForWebsite) {
     if (!isValidWebsite(messageText)) {
-      return await ctx.reply("Invalid website url");
+      return await ctx.replyWithHTML(
+        "<b>❌ Invalid website URL</b>\n\nPlease enter a valid URL starting with http:// or https://"
+      );
     }
 
     await updateBotGroup(groupId, {
       website: messageText,
     });
 
-    return await ctx.reply(`✅ Website saved: ${messageText}`);
+    return await ctx.replyWithHTML(
+      `<b>✅ Website saved!</b>\n\n<a href="${messageText}">${messageText}</a>`
+    );
   } else if (pendingEdits.waitingForTelegram) {
     if (!isValidTelegramUrl(messageText)) {
-      return await ctx.reply("Invalid Telegram URL");
+      return await ctx.replyWithHTML(
+        "<b>❌ Invalid Telegram URL</b>\n\nPlease enter a valid URL starting with t.me/ or https://t.me/"
+      );
     }
 
     await updateBotGroup(groupId, {
       telegram: messageText,
     });
 
-    return await ctx.reply(`✅ Telegram saved: ${messageText}`);
+    return await ctx.replyWithHTML(
+      `<b>✅ Telegram saved!</b>\n\n<a href="${messageText}">${messageText}</a>`
+    );
   } else if (pendingEdits.waitingForX) {
     if (!isValidXHandle(messageText)) {
-      return await ctx.reply("Invalid X handle");
+      return await ctx.replyWithHTML(
+        "<b>❌ Invalid X handle</b>\n\nPlease enter a valid X handle (e.g. @username) or URL"
+      );
     }
 
     await updateBotGroup(groupId, {
       x: messageText,
     });
 
-    return await ctx.reply(`✅ X saved: ${messageText}`);
+    const xUrl = messageText.startsWith("@")
+      ? `https://x.com/${messageText.substring(1)}`
+      : messageText;
+
+    return await ctx.replyWithHTML(
+      `<b>✅ X saved!</b>\n\n<a href="${xUrl}">${messageText}</a>`
+    );
   }
 
   ctx.session.pendingEdits = {};
@@ -193,7 +230,9 @@ bot.on(["photo", "video", "animation"], async (ctx) => {
     });
 
     ctx.session.pendingEdits = {};
-    return await ctx.reply("✅ Media saved successfully!");
+    return await ctx.replyWithHTML(
+      "<b>✅ Media saved successfully!</b>\n\nYour media will be displayed with whale alerts."
+    );
   }
 });
 
@@ -213,12 +252,16 @@ bot.on("my_chat_member", async (ctx) => {
       });
     }
 
-    await ctx.reply(
-      "🎉 Thanks for adding me! Type /help for commands.",
+    const chatTitle = "title" in ctx.chat ? ctx.chat.title : "this chat";
+
+    await ctx.replyWithHTML(
+      `<b>🎉 Thanks for adding me to ${chatTitle}!</b>\n\n` +
+        `I'll send whale transaction alerts for SUI tokens to this group.\n\n` +
+        `<i>Type /help for available commands.</i>`,
       Markup.inlineKeyboard([
         [
           Markup.button.url(
-            "Continue in private chat",
+            "⚙️ Configure Bot",
             `https://t.me/${ctx.botInfo.username}?start=setup_${ctx.chat.id}`
           ),
         ],
@@ -250,16 +293,32 @@ bot.action("toggle_bot", async (ctx) => {
     return await ctx.answerCbQuery("Group not found");
   }
 
-  const { isActive } = await updateBotGroup(groupId, {
+  await updateBotGroup(groupId, {
     isActive: !group.isActive,
   });
 
-  await ctx.answerCbQuery();
+  await ctx.answerCbQuery(
+    group.isActive ? "Bot has been deactivated" : "Bot has been activated"
+  );
 
-  await ctx.reply(`✅ Bot status updated: ${isActive ? "Active" : "Inactive"}`);
+  await editGroupMessage(
+    ctx,
+    group.isActive ? "Bot deactivated" : "Bot activated"
+  );
+});
+
+// Add a help command
+bot.command("help", async (ctx) => {
+  await ctx.replyWithHTML(
+    `<b>📚 Available Commands</b>\n\n` +
+      `<b>/start</b> - Start the bot\n` +
+      `<b>/groups</b> - List your groups\n` +
+      `<b>/help</b> - Show this help message`
+  );
 });
 
 bot.launch();
 
+// Enable graceful stop
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));

@@ -10,7 +10,7 @@ export const createWaitingAction = (
     await ctx.answerCbQuery();
     ctx.session.pendingEdits = {};
     ctx.session.pendingEdits[sessionKey] = true as never;
-    await ctx.reply(message);
+    await ctx.replyWithHTML(`<b>⚙️ ${message}</b>`);
   };
 };
 
@@ -18,12 +18,28 @@ export const editGroupMessage = async (ctx: BotContext, message?: string) => {
   const group = await getBotGroup(ctx.session.selectedGroupId || "");
 
   if (!group) {
-    return await ctx.reply("Group not found");
+    return await ctx.replyWithHTML("<b>❌ Group not found</b>");
   }
 
-  if (group.isActive)
-    await ctx.reply(
-      message || "✅ You have successfully added the bot!",
+  if (group.isActive) {
+    const statusEmoji = group.isActive ? "🟢" : "🔴";
+    const statusText = group.isActive ? "Active" : "Inactive";
+
+    await ctx.replyWithHTML(
+      `<b>${message || "✅ You have successfully added the bot!"}</b>\n\n` +
+        `<b>📊 Current Configuration:</b>\n` +
+        `<b>• Group:</b> ${group.groupTitle || "Unknown"}\n` +
+        `<b>• Status:</b> ${statusEmoji} ${statusText}\n` +
+        `<b>• Token:</b> ${
+          group.token
+            ? `<code>${group.token.substring(0, 10)}...${group.token.substring(
+                group.token.length - 6
+              )}</code>`
+            : "Not set"
+        }\n` +
+        `<b>• Min Buy:</b> ${group.minBuy} USD\n` +
+        `<b>• Emoji:</b> ${group.emoji || "🐳"}\n\n` +
+        `<i>Select an option below to configure your whale alerts:</i>`,
       Markup.inlineKeyboard([
         [
           Markup.button.callback("💎 Token", "update_token"),
@@ -44,6 +60,7 @@ export const editGroupMessage = async (ctx: BotContext, message?: string) => {
         ],
       ])
     );
+  }
 };
 
 export const listGroupsMessage = async (ctx: BotContext) => {
@@ -52,13 +69,14 @@ export const listGroupsMessage = async (ctx: BotContext) => {
   if (groups.length > 0) {
     const groupButtons = groups.map((group) => [
       Markup.button.callback(
-        `⚙️ ${group.groupTitle}`,
+        `${group.isActive ? "🟢" : "🔴"} ${group.groupTitle}`,
         `edit_group_${group.groupId}`
       ),
     ]);
 
-    await ctx.reply(
-      "Select a group to configure:",
+    await ctx.replyWithHTML(
+      `<b>🔍 Your Monitored Groups</b>\n\n` +
+        `<i>Select a group to configure whale alerts:</i>`,
       Markup.inlineKeyboard([
         ...groupButtons,
         [
@@ -70,8 +88,13 @@ export const listGroupsMessage = async (ctx: BotContext) => {
       ])
     );
   } else {
-    await ctx.reply(
-      "👋 Welcome to Sui Telegram Whale Bot!",
+    await ctx.replyWithHTML(
+      `<b>👋 Welcome to Sui Telegram Whale Bot!</b>\n\n` +
+        `<i>This bot tracks whale transactions on the Sui blockchain and sends alerts to your group.</i>\n\n` +
+        `<b>To get started:</b>\n` +
+        `1️⃣ Add this bot to your group\n` +
+        `2️⃣ Configure your alert settings\n` +
+        `3️⃣ Start receiving whale alerts!`,
       Markup.inlineKeyboard([
         [
           Markup.button.url(
@@ -82,6 +105,15 @@ export const listGroupsMessage = async (ctx: BotContext) => {
       ])
     );
   }
+};
+
+/**
+ * Format a number with commas as thousand separators
+ * @param num The number to format
+ * @returns Formatted number string with commas
+ */
+export const formatNumber = (num: number): string => {
+  return num.toLocaleString("en-US");
 };
 
 export const isValidSuiAddress = (address: string) => {
