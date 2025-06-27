@@ -20,6 +20,7 @@ import {
   isValidXHandle,
   editGroupMessage,
   listGroupsMessage,
+  isSingleEmoji,
 } from "./lib/utils";
 import {
   BOT_TOKEN,
@@ -126,93 +127,125 @@ bot.command("test", async (ctx) => {
 
 bot.on(message("text"), async (ctx) => {
   const { pendingEdits } = ctx.session;
-  const messageText = ctx.message.text;
+  const text = ctx.message.text;
   const groupId = ctx.session.selectedGroupId || "";
 
   if (pendingEdits.waitingForToken) {
-    if (!isValidSuiAddress(messageText)) {
+    if (!isValidSuiAddress(text)) {
       return await ctx.replyWithHTML(
-        "<b>❌ Invalid SUI address</b>\n\nPlease send a valid SUI address."
+        `❌ <b>INVALID TOKEN ADDRESS</b>
+
+<i>The address format doesn't match Sui network standards</i>
+
+Please send a <b>valid Sui token address</b>
+<i>Example: 0xc1a35b6a9771e6eb69e3b36e921a3a373e6d33e6f863dab6949ed3c2d1228f73::neonet::NEONET</i>`
       );
     }
 
     await updateBotGroup(groupId, {
-      tokenAddress: messageText,
+      tokenAddress: text,
     });
 
     return await ctx.replyWithHTML(
-      `<b>✅ Token address saved!</b>\n\n<code>${messageText}</code>`
+      `<b>✅ Token address saved!</b>\n\n<code>${text}</code>`
     );
   } else if (pendingEdits.waitingForEmoji) {
-    if (messageText.length > MAX_EMOJI_LENGTH) {
+    if (!isSingleEmoji(text)) {
       return await ctx.replyWithHTML(
-        "<b>❌ Emoji must be a single character</b>"
+        `❌ <b>INVALID EMOJI</b>
+
+<i>Please provide a single emoji</i>
+
+Send a <b>single emoji</b>
+<i>Example: 🚀</i>`
       );
     }
-
     await updateBotGroup(groupId, {
-      emoji: messageText,
+      emoji: text,
     });
 
-    return await ctx.replyWithHTML(`<b>✅ Emoji saved!</b>\n\n${messageText}`);
+    return await ctx.replyWithHTML(`<b>✅ Emoji saved!</b>\n\n${text}`);
   } else if (pendingEdits.waitingForMinBuy) {
-    if (parseFloat(messageText) < MIN_WHALE_BUY) {
+    if (parseFloat(text) < MIN_WHALE_BUY) {
       return await ctx.replyWithHTML(
-        `<b>❌ Min buy must be greater than ${MIN_WHALE_BUY}</b>`
+        `❌ <b>INVALID MIN BUY</b>
+
+<i>Please provide a minimum buy amount greater than ${MIN_WHALE_BUY}</i>
+
+Send a <b>valid amount</b>
+<i>Example: 1200</i>`
       );
     }
     await updateBotGroup(groupId, {
-      minBuy: parseFloat(messageText),
+      minBuy: parseFloat(text),
     });
 
     return await ctx.replyWithHTML(
-      `<b>✅ Min buy saved!</b>\n\n<code>${messageText}</code> SUI`
+      `<b>✅ Min buy saved!</b>\n\n<code>${text}</code> SUI`
     );
   } else if (pendingEdits.waitingForWebsite) {
-    if (!isValidWebsite(messageText)) {
+    if (!isValidWebsite(text)) {
       return await ctx.replyWithHTML(
-        "<b>❌ Invalid website URL</b>\n\nPlease enter a valid URL starting with http:// or https://"
+        `❌ <b>INVALID WEBSITE</b>
+
+<i>Please provide a valid website URL</i>
+
+Send a <b>valid website URL</b>
+<i>Example: https://neonetai.ai</i>`,
+        { link_preview_options: { is_disabled: true } }
       );
     }
 
     await updateBotGroup(groupId, {
-      website: messageText,
+      website: text,
     });
 
     return await ctx.replyWithHTML(
-      `<b>✅ Website saved!</b>\n\n<a href="${messageText}">${messageText}</a>`
+      `<b>✅ Website saved!</b>\n\n<a href="${text}">${text}</a>`
     );
   } else if (pendingEdits.waitingForTelegram) {
-    if (!isValidTelegramUrl(messageText)) {
+    if (!isValidTelegramUrl(text)) {
       return await ctx.replyWithHTML(
-        "<b>❌ Invalid Telegram URL</b>\n\nPlease enter a valid URL starting with t.me/ or https://t.me/"
+        `❌ <b>INVALID TELEGRAM URL</b>
+
+<i>Please provide a valid Telegram group or channel link</i>
+
+Send a <b>valid t.me link</b>
+<i>Example: https://t.me/neonet_agent</i>`,
+        { link_preview_options: { is_disabled: true } }
       );
     }
 
     await updateBotGroup(groupId, {
-      telegram: messageText,
+      telegram: text,
     });
 
     return await ctx.replyWithHTML(
-      `<b>✅ Telegram saved!</b>\n\n<a href="${messageText}">${messageText}</a>`
+      `<b>✅ Telegram saved!</b>\n\n<a href="${text}">${text}</a>`
     );
   } else if (pendingEdits.waitingForX) {
-    if (!isValidXHandle(messageText)) {
+    if (!isValidXHandle(text)) {
       return await ctx.replyWithHTML(
-        "<b>❌ Invalid X handle</b>\n\nPlease enter a valid X handle (e.g. @username) or URL"
+        `❌ <b>INVALID X HANDLE</b>
+
+<i>Please provide a valid X handle</i>
+
+Send a <b>valid X handle</b>
+<i>Example: @neonet_agent</i>`,
+        { link_preview_options: { is_disabled: true } }
       );
     }
 
     await updateBotGroup(groupId, {
-      x: messageText,
+      x: text,
     });
 
-    const xUrl = messageText.startsWith("@")
-      ? `https://x.com/${messageText.substring(1)}`
-      : messageText;
+    const xUrl = text.startsWith("@")
+      ? `https://x.com/${text.substring(1)}`
+      : text;
 
     return await ctx.replyWithHTML(
-      `<b>✅ X saved!</b>\n\n<a href="${xUrl}">${messageText}</a>`
+      `<b>✅ X saved!</b>\n\n<a href="${xUrl}">${text}</a>`
     );
   }
 
