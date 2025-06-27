@@ -107,11 +107,6 @@ export const listGroupsMessage = async (ctx: BotContext) => {
   }
 };
 
-/**
- * Format a number with commas as thousand separators
- * @param num The number to format
- * @returns Formatted number string with commas
- */
 export const formatNumber = (num: number): string => {
   return num.toLocaleString("en-US");
 };
@@ -167,4 +162,13 @@ export function isValidWebsite(value: string) {
   } catch {
     return false;
   }
+}
+
+export function isSingleEmoji(input: string): boolean {
+  const normalized = input.trim();
+
+  const emojiRegex =
+    /^(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)(?:\u200D(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F))*$/u;
+
+  return emojiRegex.test(normalized) && normalized.length <= 8;
 }
