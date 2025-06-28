@@ -74,56 +74,6 @@ bot.command("groups", async (ctx) => {
   await listGroupsMessage(ctx);
 });
 
-bot.command("test", async (ctx) => {
-  const groupId = ctx.session.selectedGroupId || "";
-
-  // Get group configuration
-  const group = await getBotGroup(groupId);
-
-  if (!group) {
-    return await ctx.replyWithHTML("<b>❌ No group selected</b>");
-  }
-
-  // If no media set
-  if (!group.mediaUrl) {
-    return await ctx.replyWithHTML("<b>❌ No media set for this group</b>");
-  }
-
-  // Prepare caption
-  const caption =
-    `🔍 Test Message\n\n` +
-    `Token: ${group.tokenAddress || "Not set"}\n` +
-    `Min Buy: ${group.minBuy} SUI\n` +
-    `${group.emoji || "🐳"} Website: ${group.website || "Not set"}`;
-
-  // Send media based on type
-  try {
-    switch (group.mediaType) {
-      case "PHOTO":
-        await ctx.replyWithPhoto(group.mediaUrl, {
-          caption: caption,
-          parse_mode: "HTML",
-        });
-        break;
-      case "VIDEO":
-        await ctx.replyWithVideo(group.mediaUrl, {
-          caption: caption,
-          parse_mode: "HTML",
-        });
-        break;
-      case "ANIMATION":
-        await ctx.replyWithAnimation(group.mediaUrl, {
-          caption: caption,
-          parse_mode: "HTML",
-        });
-        break;
-    }
-  } catch (error) {
-    await ctx.replyWithHTML(
-      "<b>❌ Error sending media. Please try setting media again.</b>"
-    );
-  }
-});
 
 bot.on(message("text"), async (ctx) => {
   const { pendingEdits } = ctx.session;
