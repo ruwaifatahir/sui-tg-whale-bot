@@ -12,7 +12,6 @@ model BoostOrder {
   id                     String        @id
   telegramChatId         BigInt
   tokenAddress           String
-  tgUrl                  String
   boostPackage           String
   boostDurationHours     Int
   priceSui               Float
@@ -50,6 +49,16 @@ model BotGroup {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   tokenAddress String?
+}
+
+model ProcessedAlert {
+  id           String   @id
+  tradeDigest  String
+  tokenAddress String
+  destination  String
+  createdAt    DateTime @default(now())
+
+  @@unique([tradeDigest, tokenAddress, destination])
 }
 
 enum PaymentStatus {
