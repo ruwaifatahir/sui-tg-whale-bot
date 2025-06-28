@@ -253,7 +253,7 @@ bot.on("my_chat_member", async (ctx) => {
 
     await ctx.replyWithHTML(
       `<b>🎉 Thanks for adding me to ${chatTitle}!</b>\n\n` +
-        `I'll send whale transaction alerts for SUI tokens to this group.\n\n` +
+        `Configure me to get alerts of whale buys in this group.\n\n` +
         `<i>Type /help for available commands.</i>`,
       Markup.inlineKeyboard([
         [
