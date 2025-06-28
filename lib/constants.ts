@@ -5,7 +5,7 @@ export const REDIS_HOST = process.env.REDIS_HOST;
 export const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 export const REDIS_PORT = process.env.REDIS_PORT || "6379";
 
-export const MIN_WHALE_BUY = 1000;
+export const MIN_WHALE_BUY = 5000;
 export const MAX_EMOJI_LENGTH = 1;
 
 export const editGroupActions = {
