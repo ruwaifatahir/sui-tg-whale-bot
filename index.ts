@@ -74,7 +74,6 @@ bot.command("groups", async (ctx) => {
   await listGroupsMessage(ctx);
 });
 
-
 bot.on(message("text"), async (ctx) => {
   const { pendingEdits } = ctx.session;
   const text = ctx.message.text;
@@ -123,7 +122,7 @@ Send a <b>single emoji</b>
 <i>Please provide a minimum buy amount greater than ${MIN_WHALE_BUY}</i>
 
 Send a <b>valid amount</b>
-<i>Example: 1200</i>`
+<i>Example: ${MIN_WHALE_BUY + 200}</i>`
       );
     }
     await updateBotGroup(groupId, {
