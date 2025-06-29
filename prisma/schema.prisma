@@ -39,7 +39,7 @@ model BotGroup {
   addedBy      String
   addedAt      DateTime   @default(now())
   isActive     Boolean    @default(true)
-  minBuy       Float      @default(5000)
+  minBuy       Float      @default(1000)
   emoji        String     @default("🐳")
   mediaType    MediaType?
   mediaUrl     String?
